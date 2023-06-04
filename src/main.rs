@@ -1,8 +1,8 @@
-use axum::{
-    routing::get,
-    Router,
-};
 use std::net::SocketAddr;
+
+mod bootstrap;
+mod controllers;
+mod router;
 
 #[tokio::main]
 async fn main() {
@@ -11,8 +11,8 @@ async fn main() {
      .init();
     let addr = SocketAddr::from(([0, 0, 0, 0], 3000));
     tracing::debug!("listening on {}", addr);
-    let app = Router::new().route("/", get(|| async { "Hello, World!" }));
-    axum::Server::bind(&"0.0.0.0:3000".parse().unwrap())
+    let app = bootstrap::create_app().await;
+    axum::Server::bind(&addr)
         .serve(app.into_make_service())
         .await
         .unwrap();
